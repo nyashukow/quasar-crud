@@ -22,7 +22,8 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from '@vue/composition-api'
-import useUserService from '../hooks/useUserService'
+
+import useRestService from '../hooks/useRestService'
 import { User } from 'types/models'
 
 export default defineComponent({
@@ -36,7 +37,12 @@ export default defineComponent({
   },
 
   setup ({ id }, { emit }) {
-    const { fetchUserById, createUser, updateUser, removeUser } = useUserService()
+    const {
+      fetchDocumentById,
+      createDocument,
+      updateDocument,
+      removeDocument
+    } = useRestService<User>({ baseUrl: 'https://jsonplaceholder.typicode.com', suffix: '/users' })
 
     const DEFAULT_USER: Readonly<User> = {
       name: '',
@@ -47,7 +53,7 @@ export default defineComponent({
     const user = ref<User | undefined>(undefined)
 
     onBeforeMount(async () => {
-      user.value = id !== -1 ? await fetchUserById(id) : { ...DEFAULT_USER }
+      user.value = id !== -1 ? await fetchDocumentById(id) : { ...DEFAULT_USER }
     })
 
     const save = async () => {
@@ -56,11 +62,11 @@ export default defineComponent({
       }
       let newUser: User
       if (user.value.id) {
-        newUser = await updateUser(user.value)
+        newUser = await updateDocument(user.value)
         user.value = newUser
         emit('user:updated', newUser)
       } else {
-        newUser = await createUser(user.value)
+        newUser = await createDocument(user.value)
         user.value = newUser
         emit('user:created', newUser)
       }
@@ -70,7 +76,7 @@ export default defineComponent({
       if (!user.value) {
         throw new Error('user not defined')
       }
-      const removedUser = await removeUser(user.value)
+      const removedUser = await removeDocument(user.value)
       emit('user:removed', removedUser)
     }
 

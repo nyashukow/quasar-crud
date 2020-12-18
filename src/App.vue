@@ -4,13 +4,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, provide } from '@vue/composition-api'
-import Axios from 'axios'
+import { defineComponent } from '@vue/composition-api'
 
 export default defineComponent({
-  name: 'App',
-  setup () {
-    provide('axios', Axios.create())
-  }
+  name: 'App'
 })
 </script>

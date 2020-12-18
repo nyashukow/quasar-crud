@@ -44,10 +44,11 @@
 
 <script lang="ts">
 import { defineComponent, onBeforeMount, ref } from '@vue/composition-api'
-import { User } from 'types/models'
+
 import UserCard from 'components/UserCard.vue'
-import useUserService from '../hooks/useUserService'
-import { NEW_USER_ID } from 'types/constants'
+import useRestService from '../hooks/useRestService'
+import { NEW_USER_ID } from '../types/constants'
+import { User } from '../types/models'
 
 const columnsArr = [
   {
@@ -78,11 +79,11 @@ export default defineComponent({
   },
 
   setup () {
-    const { fetchUsers } = useUserService()
+    const { fetchDocuments } = useRestService<User>({ baseUrl: 'https://jsonplaceholder.typicode.com', suffix: '/users' })
     const users = ref<User[]>([])
 
     onBeforeMount(async () => {
-      users.value = await fetchUsers()
+      users.value = await fetchDocuments()
     })
 
     const columns = ref(columnsArr)
