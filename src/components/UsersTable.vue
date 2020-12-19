@@ -26,29 +26,28 @@
           color="primary"
           icon="add"
           class="q-ml-md"
-          @click="onNewClick"
+          @click="dialogOpen = true"
         />
       </template>
     </q-table>
     <q-dialog v-model="dialogOpen">
       <user-card
-        :id="selectedUser"
-        :key="selectedUser"
-        @user:created="onUserCreated"
-        @user:updated="onUserUpdated"
-        @user:removed="onUserRemoved"
+        :user="user"
+        @click:save="save"
+        @click:remove="remove"
       />
     </q-dialog>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from '@vue/composition-api'
+import { defineComponent, ref, watch } from '@vue/composition-api'
 
 import UserCard from 'components/UserCard.vue'
+import useCollection from '../hooks/useCollection'
 import useRestService from '../hooks/useRestService'
-import { NEW_USER_ID } from '../types/constants'
-import { User } from '../types/models'
+import useCard from '../hooks/useCard'
+import { User, DEFAULT_USER } from '../types'
 
 const columnsArr = [
   {
@@ -79,49 +78,52 @@ export default defineComponent({
   },
 
   setup () {
-    const { fetchDocuments } = useRestService<User>({ baseUrl: 'https://jsonplaceholder.typicode.com', suffix: '/users' })
-    const users = ref<User[]>([])
-
-    onBeforeMount(async () => {
-      users.value = await fetchDocuments()
+    const restService = useRestService<User>({
+      baseUrl: 'https://jsonplaceholder.typicode.com',
+      suffix: '/users'
     })
+    const collection = useCollection({ restService })
+    const card = useCard({ defaultDocument: DEFAULT_USER })
 
     const columns = ref(columnsArr)
     const filter = ref('')
 
-    const selectedUser = ref(NEW_USER_ID)
     const dialogOpen = ref(false)
 
     const onRowClick = (e: MouseEvent, user: User) => {
-      selectedUser.value = user.id || NEW_USER_ID
+      card.set(user)
       dialogOpen.value = true
     }
-    const onNewClick = () => {
-      selectedUser.value = NEW_USER_ID
-      dialogOpen.value = true
-    }
-    const onUserCreated = (user: User) => {
-      users.value = users.value.concat(user)
-    }
-    const onUserUpdated = (user: User) => {
-      users.value = users.value.map(u => u.id === user.id ? user : u)
-    }
-    const onUserRemoved = (user: User) => {
-      users.value = users.value.filter(u => u.id !== user.id)
+    watch(dialogOpen, (value) => {
+      if (!value) {
+        card.reset()
+      }
+    })
+    card.onBeforeCreate(async (user: User) => {
+      return await collection.pushDocument(user)
+    })
+    card.onBeforeUpdate(async (user: User) => {
+      return await collection.replaceDocument(user)
+    })
+    card.onBeforeRemove(async (user: User) => {
+      return await collection.removeDocument(user)
+    })
+    card.onBeforeRemove((user: User) => {
       dialogOpen.value = false
-    }
+      return user
+    })
 
     return {
+      // data
       columns,
       filter,
       dialogOpen,
-      selectedUser,
-      users,
+      user: card.document,
+      users: collection.documents,
+      // methods
       onRowClick,
-      onNewClick,
-      onUserCreated,
-      onUserUpdated,
-      onUserRemoved
+      save: card.save,
+      remove: card.remove
     }
   }
 })

@@ -12,79 +12,26 @@
     </q-card-section>
 
     <q-card-actions>
-      <q-btn v-if="user && user.id" flat label="Remove" @click="remove" />
+      <q-btn v-if="user && user.id" flat label="Remove" @click="$emit('click:remove')" />
       <q-space />
       <q-btn flat label="Cancel" v-close-popup />
-      <q-btn flat label="Save" color="primary" @click="save" />
+      <q-btn flat label="Save" color="primary" @click="$emit('click:save')" />
     </q-card-actions>
   </q-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeMount, ref } from '@vue/composition-api'
+import { defineComponent, PropOptions } from '@vue/composition-api'
 
-import useRestService from '../hooks/useRestService'
 import { User } from 'types/models'
 
 export default defineComponent({
   name: 'UserCard',
 
   props: {
-    id: {
-      type: Number,
+    user: {
       required: true
-    }
-  },
-
-  setup ({ id }, { emit }) {
-    const {
-      fetchDocumentById,
-      createDocument,
-      updateDocument,
-      removeDocument
-    } = useRestService<User>({ baseUrl: 'https://jsonplaceholder.typicode.com', suffix: '/users' })
-
-    const DEFAULT_USER: Readonly<User> = {
-      name: '',
-      email: '',
-      username: '',
-      phone: ''
-    }
-    const user = ref<User | undefined>(undefined)
-
-    onBeforeMount(async () => {
-      user.value = id !== -1 ? await fetchDocumentById(id) : { ...DEFAULT_USER }
-    })
-
-    const save = async () => {
-      if (!user.value) {
-        throw new Error('user not defined')
-      }
-      let newUser: User
-      if (user.value.id) {
-        newUser = await updateDocument(user.value)
-        user.value = newUser
-        emit('user:updated', newUser)
-      } else {
-        newUser = await createDocument(user.value)
-        user.value = newUser
-        emit('user:created', newUser)
-      }
-    }
-
-    const remove = async () => {
-      if (!user.value) {
-        throw new Error('user not defined')
-      }
-      const removedUser = await removeDocument(user.value)
-      emit('user:removed', removedUser)
-    }
-
-    return {
-      user,
-      save,
-      remove
-    }
+    } as PropOptions<User>
   }
 })
 </script>
