@@ -11,13 +11,13 @@
       src="https://cdn.quasar.dev/img/material.png"
       style="height: 191.6px"
     >
-      <div class="absolute-bottom bg-transparent">
+      <div v-if="user" class="absolute-bottom bg-transparent">
         <q-avatar size="56px" class="q-mb-sm">
           <img
             src="https://pickaface.net/gallery/avatar/20130805_083256_2262_Fab.png"
           />
         </q-avatar>
-        <div class="text-weight-bold">Anonymous</div>
+        <div class="text-weight-bold">{{ user.name }}</div>
         <div>@anonymous</div>
       </div>
     </q-img>
@@ -31,11 +31,11 @@
           <q-item-section> Home </q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple to="/users">
+        <q-item clickable v-ripple to="/persons">
           <q-item-section avatar>
             <q-icon name="group" />
           </q-item-section>
-          <q-item-section> Users </q-item-section>
+          <q-item-section> Persons </q-item-section>
         </q-item>
       </q-list>
     </q-scroll-area>
@@ -43,7 +43,8 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent } from '@vue/composition-api'
+import { computed, defineComponent } from '@vue/composition-api'
+import useAuth from 'src/hooks/useAuth'
 
 export default defineComponent({
   name: 'LayoutDrawer',
@@ -60,11 +61,16 @@ export default defineComponent({
     }
   },
 
-  setup (props, { emit }) {
+  setup (props, { emit, root }) {
+    const auth = useAuth(root.$store)
+
+    const user = computed(() => auth.user())
+
     const onChange = (e: boolean) => emit('change', e)
 
     return {
-      onChange
+      onChange,
+      user
     }
   }
 })

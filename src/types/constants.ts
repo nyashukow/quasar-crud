@@ -1,6 +1,6 @@
-import { User } from './models'
+import { Person } from './models'
 
-export const DEFAULT_USER: Readonly<User> = {
+export const DEFAULT_PERSON: Readonly<Person> = {
   name: '',
   email: '',
   username: '',

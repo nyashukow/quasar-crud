@@ -8,6 +8,7 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers')
+const path = require('path')
 
 module.exports = configure(function (ctx) {
   return {
@@ -25,6 +26,7 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
+      'auth',
       'composition-api'
     ],
 
@@ -77,6 +79,10 @@ module.exports = configure(function (ctx) {
             exclude: /node_modules/
           })
         }
+      },
+      chainWebpack (chain, { isServer, isClient }) {
+        chain.resolve.alias
+          .set('types', path.resolve(__dirname, './src/types'))
       }
     },
 
@@ -106,7 +112,9 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Cookies'
+      ]
     },
 
     // animations: 'all', // --- includes all animations

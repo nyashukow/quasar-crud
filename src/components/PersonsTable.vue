@@ -1,8 +1,8 @@
 <template>
   <div>
     <q-table
-      title="Users"
-      :data="users"
+      title="Person"
+      :data="persons"
       :columns="columns"
       :filter="filter"
       row-key="id"
@@ -31,8 +31,8 @@
       </template>
     </q-table>
     <q-dialog v-model="dialogOpen">
-      <user-card
-        :user="user"
+      <person-card
+        :person="person"
         @click:save="save"
         @click:remove="remove"
       />
@@ -43,11 +43,11 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from '@vue/composition-api'
 
-import UserCard from 'components/UserCard.vue'
+import PersonCard from 'components/PersonCard.vue'
 import useCollection from '../hooks/useCollection'
 import useRestService from '../hooks/useRestService'
 import useCard from '../hooks/useCard'
-import { User, DEFAULT_USER } from '../types'
+import { Person, DEFAULT_PERSON } from '../types'
 
 const columnsArr = [
   {
@@ -71,27 +71,27 @@ const columnsArr = [
 ]
 
 export default defineComponent({
-  name: 'UserTable',
+  name: 'PersonsTable',
 
   components: {
-    UserCard
+    PersonCard
   },
 
   setup () {
-    const restService = useRestService<User>({
+    const restService = useRestService<Person>({
       baseUrl: 'https://jsonplaceholder.typicode.com',
       suffix: '/users'
     })
     const collection = useCollection({ restService })
-    const card = useCard({ defaultDocument: DEFAULT_USER })
+    const card = useCard({ defaultDocument: DEFAULT_PERSON })
 
     const columns = ref(columnsArr)
     const filter = ref('')
 
     const dialogOpen = ref(false)
 
-    const onRowClick = (e: MouseEvent, user: User) => {
-      card.set(user)
+    const onRowClick = (e: MouseEvent, person: Person) => {
+      card.set(person)
       dialogOpen.value = true
     }
     watch(dialogOpen, (value) => {
@@ -99,18 +99,18 @@ export default defineComponent({
         card.reset()
       }
     })
-    card.onBeforeCreate(async (user: User) => {
-      return await collection.pushDocument(user)
+    card.onBeforeCreate(async (person) => {
+      return await collection.pushDocument(person)
     })
-    card.onBeforeUpdate(async (user: User) => {
-      return await collection.replaceDocument(user)
+    card.onBeforeUpdate(async (person) => {
+      return await collection.replaceDocument(person)
     })
-    card.onBeforeRemove(async (user: User) => {
-      return await collection.removeDocument(user)
+    card.onBeforeRemove(async (person) => {
+      return await collection.removeDocument(person)
     })
-    card.onBeforeRemove((user: User) => {
+    card.onBeforeRemove((person) => {
       dialogOpen.value = false
-      return user
+      return person
     })
 
     return {
@@ -118,8 +118,8 @@ export default defineComponent({
       columns,
       filter,
       dialogOpen,
-      user: card.document,
-      users: collection.documents,
+      person: card.document,
+      persons: collection.documents,
       // methods
       onRowClick,
       save: card.save,

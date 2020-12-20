@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import { HttpInstance, HttpRequestConfig } from '../types/models'
+import { get, set } from 'lodash'
 
 export default function (config: HttpRequestConfig): HttpInstance {
   const axios = Axios.create({ baseURL: config.baseUrl })
@@ -20,6 +21,12 @@ export default function (config: HttpRequestConfig): HttpInstance {
     delete: async <R = any> (url = '') => {
       const response = await axios.delete<R>(url)
       return response.data
+    },
+    setHeader (header: string, value: string) {
+      set(axios, ['defaults', 'headers', 'common', header], value)
+    },
+    getHeader (header: string): string {
+      return get(axios, ['defaults', 'headers', 'common', header]) as string
     }
   }
 
