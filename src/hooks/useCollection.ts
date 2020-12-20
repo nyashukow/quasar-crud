@@ -8,18 +8,33 @@ export default function <T extends Identible> (config: TableApiConfig<T>): Table
 
   const pushDocument = async (doc: T) => {
     const newDoc = await rest.createDocument(doc)
+
+    if (!newDoc) {
+      throw new Error('Document not created')
+    }
+
     documents.value = documents.value.concat(newDoc)
     return newDoc
   }
 
   const replaceDocument = async (doc: T) => {
     const newDoc = await rest.updateDocument(doc)
+
+    if (!newDoc) {
+      throw new Error('Document not updated')
+    }
+
     documents.value = documents.value.map(d => d.id === newDoc.id ? newDoc : d)
     return newDoc
   }
 
   const removeDocument = async (doc: T) => {
     const removedDoc = await rest.removeDocument(doc)
+
+    if (!removedDoc) {
+      throw new Error('Document not removed')
+    }
+
     documents.value = documents.value.filter(d => d.id !== removedDoc.id)
     return removedDoc
   }

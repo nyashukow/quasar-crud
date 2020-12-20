@@ -6,9 +6,7 @@ import { Store } from 'vuex'
 export default boot<Store<unknown>>(({ router, store }) => {
   router.beforeEach(async (to: RouteWithAuthMeta, from, next) => {
     if (!store.getters['auth/loggedIn']) {
-      await store.dispatch('auth/fetch').catch(async () => {
-        await store.dispatch('auth/logout')
-      })
+      await store.dispatch('auth/fetch').catch(() => store.dispatch('auth/logout'))
     }
 
     const authMeta = to.meta?.auth

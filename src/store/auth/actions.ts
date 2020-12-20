@@ -6,7 +6,7 @@ import { ActionContext } from 'vuex'
 const http = useAxiosProxy({ baseUrl: 'http://localhost:3001' })
 
 export function register (ctx: AuthActionContext, data: RegisterData) {
-  return http.post('/auth/register', data)
+  return http.post<RegisterData, void>('/auth/register', data)
 }
 
 export function login (ctx: AuthActionContext, data: LoginData) {
@@ -46,7 +46,7 @@ export async function fetch (ctx: AuthActionContext) {
     throw new Error('No authorization token found')
   }
 
-  return http.get('/auth/me').then(response => {
+  return http.get<UserFetchData>('/auth/me').then(response => {
     ctx.commit('setUser', response)
   }).then(async () => {
     await ctx.dispatch('loginCallback')
@@ -59,7 +59,7 @@ export function logout (ctx: AuthActionContext) {
 }
 
 export function verify (ctx: AuthActionContext, token: string) {
-  return http.get(`/auth/verify?token=${token}`)
+  return http.get<boolean>(`/auth/verify?token=${token}`)
 }
 
 export function loginCallback (ctx: AuthActionContext) {

@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { HttpInstance, HttpRequestConfig } from '../types/models'
+import { HttpInstance, HttpRequestConfig } from 'src/types'
 import { get, set } from 'lodash'
 
 export default function (config: HttpRequestConfig): HttpInstance {

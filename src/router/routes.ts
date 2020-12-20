@@ -5,7 +5,7 @@ const routes: RouteConfig[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { meta: { auth: ['user'] }, path: '/persons', component: () => import('pages/Persons.vue') }
+      { meta: {}, path: '/persons', component: () => import('pages/Persons.vue') }
     ]
   },
   {

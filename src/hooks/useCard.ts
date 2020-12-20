@@ -1,11 +1,8 @@
 import { onBeforeMount, Ref, ref } from '@vue/composition-api'
-import { Identible } from 'types/models'
+import { Identible } from 'src/types'
+import { cloneDeep } from 'src/shared/utils'
 
-export default function <T extends Identible> (config: CardApiConfig <T>): CardApi<T> {
-  const cloneDeep = (doc: T | Readonly<T>): T => {
-    return JSON.parse(JSON.stringify(doc)) as T
-  }
-
+export default function <T extends Identible> (config: CardApiConfig<T>): CardApi<T> {
   const document = ref(cloneDeep(config.defaultDocument)) as Ref<T>
 
   const callbacks = {
@@ -32,8 +29,8 @@ export default function <T extends Identible> (config: CardApiConfig <T>): CardA
     callbacks.beforeRemove.push(cb)
   }
   const callCallbacks = async (callbacks: ChangeCallback<T>[]) => {
-    for (let i = 0; i < callbacks.length; i++) {
-      document.value = await callbacks[i](document.value)
+    for (const callback of callbacks) {
+      document.value = await callback(document.value)
     }
   }
 
@@ -45,9 +42,9 @@ export default function <T extends Identible> (config: CardApiConfig <T>): CardA
     }
   }
 
-  const remove = async () => {
-    await callCallbacks(callbacks.beforeRemove)
-    reset()
+  const remove = () => {
+    return callCallbacks(callbacks.beforeRemove)
+      .then(() => reset())
   }
 
   onBeforeMount(() => {
@@ -66,7 +63,7 @@ export default function <T extends Identible> (config: CardApiConfig <T>): CardA
   }
 }
 
-export interface CardApi <T> {
+export interface CardApi<T> {
   document: Ref<T>,
   set (doc: T): void,
   reset (): void,
@@ -77,8 +74,8 @@ export interface CardApi <T> {
   onBeforeRemove (cb: ChangeCallback<T>): void,
 }
 
-export interface CardApiConfig <T> {
+export interface CardApiConfig<T> {
   defaultDocument: Readonly<T>
 }
 
-export type ChangeCallback <T> = (doc: T) => Promise<T> | T
+export type ChangeCallback<T> = (doc: T) => Promise<T> | T

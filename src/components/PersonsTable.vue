@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from '@vue/composition-api'
+import { Notify } from 'quasar'
 
 import PersonCard from 'components/PersonCard.vue'
 import useCollection from '../hooks/useCollection'
@@ -80,7 +81,7 @@ export default defineComponent({
   setup () {
     const restService = useRestService<Person>({
       baseUrl: 'https://jsonplaceholder.typicode.com',
-      suffix: '/users'
+      endpoint: '/users'
     })
     const collection = useCollection({ restService })
     const card = useCard({ defaultDocument: DEFAULT_PERSON })
@@ -99,19 +100,37 @@ export default defineComponent({
         card.reset()
       }
     })
-    card.onBeforeCreate(async (person) => {
-      return await collection.pushDocument(person)
+    card.onBeforeCreate((person) => {
+      return collection.pushDocument(person)
     })
-    card.onBeforeUpdate(async (person) => {
-      return await collection.replaceDocument(person)
+    card.onBeforeUpdate((person) => {
+      return collection.replaceDocument(person)
     })
-    card.onBeforeRemove(async (person) => {
-      return await collection.removeDocument(person)
+    card.onBeforeRemove((person) => {
+      return collection.removeDocument(person)
     })
     card.onBeforeRemove((person) => {
       dialogOpen.value = false
       return person
     })
+
+    const save = () => card.save()
+      .catch((err: Error) => {
+        Notify.create({
+          type: 'error',
+          position: 'top-right',
+          message: err.message
+        })
+      })
+
+    const remove = () => card.remove()
+      .catch((err: Error) => {
+        Notify.create({
+          type: 'error',
+          position: 'top-right',
+          message: err.message
+        })
+      })
 
     return {
       // data
@@ -122,8 +141,8 @@ export default defineComponent({
       persons: collection.documents,
       // methods
       onRowClick,
-      save: card.save,
-      remove: card.remove
+      save,
+      remove
     }
   }
 })
