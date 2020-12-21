@@ -7,7 +7,15 @@
       @new-click="dialogOpen = true"
     />
     <q-dialog v-model="dialogOpen">
-      <person-card :person="person" @click:save="save" @click:remove="remove" />
+      <base-card
+        :showRemove="person && !!person.id"
+        @click:save="save"
+        @click:remove="remove"
+      >
+        <template v-slot:form>
+          <person-form :person="person" />
+        </template>
+      </base-card>
     </q-dialog>
   </div>
 </template>
@@ -17,7 +25,8 @@ import { defineComponent, ref, watch } from '@vue/composition-api'
 import { Notify } from 'quasar'
 
 import BaseTable from 'components/BaseTable.vue'
-import PersonCard from 'components/PersonCard.vue'
+import BaseCard from 'components/BaseCard.vue'
+import PersonForm from 'components/PersonForm.vue'
 import useRestService from 'src/hooks/useRestService'
 import useCollection from 'src/hooks/useCollection'
 import useCard from 'src/hooks/useCard'
@@ -49,7 +58,8 @@ export default defineComponent({
 
   components: {
     BaseTable,
-    PersonCard
+    BaseCard,
+    PersonForm
   },
 
   setup () {
