@@ -5,7 +5,7 @@ import { get, set } from 'lodash'
 export default function (config: HttpRequestConfig): HttpInstance {
   const axios = Axios.create({ baseURL: config.baseUrl })
 
-  const http: HttpInstance = {
+  return {
     get: async <R = any> (url = '') => {
       const response = await axios.get<R>(url)
       return response.data
@@ -29,6 +29,4 @@ export default function (config: HttpRequestConfig): HttpInstance {
       return get(axios, ['defaults', 'headers', 'common', header]) as string | undefined
     }
   }
-
-  return http
 }

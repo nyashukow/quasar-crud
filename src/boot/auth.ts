@@ -1,7 +1,8 @@
 import { boot } from 'quasar/wrappers'
-import { RoleChecker } from 'src/types'
 import { Route } from 'vue-router'
 import { Store } from 'vuex'
+import _ from 'lodash'
+import { RoleChecker } from 'src/types'
 
 export default boot<Store<unknown>>(({ router, store }) => {
   router.beforeEach(async (to: RouteWithAuthMeta, from, next) => {
@@ -9,7 +10,7 @@ export default boot<Store<unknown>>(({ router, store }) => {
       await store.dispatch('auth/fetch').catch(() => store.dispatch('auth/logout'))
     }
 
-    const roles = to.meta?.authRoles
+    const roles = _.get(to, ['meta', 'auth', 'roles'], undefined) as AuthRoles
 
     if (!roles) {
       return next()
@@ -34,9 +35,13 @@ export default boot<Store<unknown>>(({ router, store }) => {
 })
 
 interface RouteWithAuthMeta extends Route {
-  meta?: {
-    authRoles: AuthMeta
+  meta?: AuthMeta
+}
+
+interface AuthMeta {
+  auth?: {
+    roles: AuthRoles
   }
 }
 
-type AuthMeta = string[] | boolean | undefined
+type AuthRoles = string[] | boolean | undefined

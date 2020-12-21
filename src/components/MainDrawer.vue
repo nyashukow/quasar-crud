@@ -43,7 +43,7 @@
 </template>
 
 <script lang='ts'>
-import { computed, defineComponent } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api'
 import useAuth from 'src/hooks/useAuth'
 
 export default defineComponent({
@@ -64,7 +64,7 @@ export default defineComponent({
   setup (props, { emit, root }) {
     const auth = useAuth(root.$store)
 
-    const user = computed(() => auth.user())
+    const user = auth.user()
 
     const onChange = (e: boolean) => emit('change', e)
 
