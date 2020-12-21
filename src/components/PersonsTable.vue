@@ -1,41 +1,13 @@
 <template>
   <div>
-    <q-table
-      title="Person"
-      :data="persons"
+    <base-table
+      :items="persons"
       :columns="columns"
-      :filter="filter"
-      row-key="id"
-      class="shadow-1"
       @row-click="onRowClick"
-    >
-      <template v-slot:top>
-        <q-input
-          borderless
-          dense
-          v-model="filter"
-          placeholder="Search"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-        <q-space />
-        <q-btn
-          round
-          color="primary"
-          icon="add"
-          class="q-ml-md"
-          @click="dialogOpen = true"
-        />
-      </template>
-    </q-table>
+      @new-click="dialogOpen = true"
+    />
     <q-dialog v-model="dialogOpen">
-      <person-card
-        :person="person"
-        @click:save="save"
-        @click:remove="remove"
-      />
+      <person-card :person="person" @click:save="save" @click:remove="remove" />
     </q-dialog>
   </div>
 </template>
@@ -44,11 +16,12 @@
 import { defineComponent, ref, watch } from '@vue/composition-api'
 import { Notify } from 'quasar'
 
+import BaseTable from 'components/BaseTable.vue'
 import PersonCard from 'components/PersonCard.vue'
-import useCollection from '../hooks/useCollection'
-import useRestService from '../hooks/useRestService'
-import useCard from '../hooks/useCard'
-import { Person, DEFAULT_PERSON } from '../types'
+import useRestService from 'src/hooks/useRestService'
+import useCollection from 'src/hooks/useCollection'
+import useCard from 'src/hooks/useCard'
+import { Person, DEFAULT_PERSON } from 'src/types'
 
 const columnsArr = [
   {
@@ -75,6 +48,7 @@ export default defineComponent({
   name: 'PersonsTable',
 
   components: {
+    BaseTable,
     PersonCard
   },
 

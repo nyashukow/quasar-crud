@@ -19,9 +19,15 @@ export default function <T extends Identible> (config: CardApiConfig<T>): CardAp
     document.value = cloneDeep(doc)
   }
 
-  const onBeforeCreate = callbacks.beforeCreate.push
-  const onBeforeUpdate = callbacks.beforeUpdate.push
-  const onBeforeRemove = callbacks.beforeRemove.push
+  const onBeforeCreate = (cb: ChangeCallback<T>) => {
+    callbacks.beforeCreate.push(cb)
+  }
+  const onBeforeUpdate = (cb: ChangeCallback<T>) => {
+    callbacks.beforeUpdate.push(cb)
+  }
+  const onBeforeRemove = (cb: ChangeCallback<T>) => {
+    callbacks.beforeRemove.push(cb)
+  }
 
   const callCallbacks = async (callbacks: ChangeCallback<T>[]) => {
     for (const callback of callbacks) {
