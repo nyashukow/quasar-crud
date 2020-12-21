@@ -5,7 +5,7 @@ const dev = process.env.NODE_ENV === 'development'
 
 export default function <T extends Identible> (config: RestServiceConfig): RestService<T> {
   const http = useAxiosProxy({ baseUrl: config.baseUrl || '' })
-  const endpoint = config.endpoint
+  const { endpoint } = config
 
   const fetchDocuments = async () => {
     return http.get<T[]>(endpoint)

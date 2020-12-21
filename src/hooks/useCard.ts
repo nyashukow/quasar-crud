@@ -19,15 +19,10 @@ export default function <T extends Identible> (config: CardApiConfig<T>): CardAp
     document.value = cloneDeep(doc)
   }
 
-  const onBeforeCreate = (cb: ChangeCallback<T>) => {
-    callbacks.beforeCreate.push(cb)
-  }
-  const onBeforeUpdate = (cb: ChangeCallback<T>) => {
-    callbacks.beforeUpdate.push(cb)
-  }
-  const onBeforeRemove = (cb: ChangeCallback<T>) => {
-    callbacks.beforeRemove.push(cb)
-  }
+  const onBeforeCreate = callbacks.beforeCreate.push
+  const onBeforeUpdate = callbacks.beforeUpdate.push
+  const onBeforeRemove = callbacks.beforeRemove.push
+
   const callCallbacks = async (callbacks: ChangeCallback<T>[]) => {
     for (const callback of callbacks) {
       document.value = await callback(document.value)
@@ -35,17 +30,15 @@ export default function <T extends Identible> (config: CardApiConfig<T>): CardAp
   }
 
   const save = async () => {
-    if (document.value.id) {
-      await callCallbacks(callbacks.beforeUpdate)
-    } else {
-      await callCallbacks(callbacks.beforeCreate)
-    }
+    const { id } = document.value
+
+    const neededCallbacks = id ? callbacks.beforeUpdate : callbacks.beforeCreate
+
+    await callCallbacks(neededCallbacks)
   }
 
-  const remove = () => {
-    return callCallbacks(callbacks.beforeRemove)
-      .then(() => reset())
-  }
+  const remove = () => callCallbacks(callbacks.beforeRemove)
+    .then(() => reset())
 
   onBeforeMount(() => {
     reset()

@@ -1,18 +1,21 @@
 import { Store } from 'vuex'
-import { Ref } from '@vue/composition-api'
+import { computed, ComputedRef } from '@vue/composition-api'
 import { AuthState, User, LoginData, RegisterData } from 'src/types'
 
-export default function (store: Store<AuthState>): Auth {
+export default function (store: Store<StoreState>): Auth {
   return {
-    register: (data) => { return store.dispatch('auth/register', data) },
-    login: (data) => { return store.dispatch('auth/login', data) },
-    fetch: () => { return store.dispatch('auth/fetch') },
-    logout: () => { return store.dispatch('auth/logout') },
-    verify: (token) => { return store.dispatch('auth/verify', token) },
+    register: (data) => store.dispatch('auth/register', data),
+    login: (data) => store.dispatch('auth/login', data),
+    fetch: () => store.dispatch('auth/fetch'),
+    logout: () => store.dispatch('auth/logout'),
 
-    loggedIn: () => { return store.getters['auth/loggedIn'] as Ref<boolean> },
-    user: () => { return store.getters['auth/user'] as Ref<User> }
+    loggedIn: () => store.getters['auth/loggedIn'] as ComputedRef<boolean>,
+    user: () => computed(() => store.state.auth.user)
   }
+}
+
+interface StoreState {
+  auth: AuthState
 }
 
 export interface Auth {
@@ -20,8 +23,7 @@ export interface Auth {
   login: (data: LoginData) => Promise<void>
   fetch: () => Promise<void>
   logout: () => Promise<void>
-  verify: (token: string) => Promise<void>
 
-  loggedIn: () => Ref<boolean>
-  user: () => Ref<User>
+  loggedIn: () => ComputedRef<boolean>
+  user: () => ComputedRef<User | undefined>
 }

@@ -9,9 +9,9 @@ export default boot<Store<unknown>>(({ router, store }) => {
       await store.dispatch('auth/fetch').catch(() => store.dispatch('auth/logout'))
     }
 
-    const authMeta = to.meta?.auth
+    const roles = to.meta?.authRoles
 
-    if (!authMeta) {
+    if (!roles) {
       return next()
     }
 
@@ -19,13 +19,13 @@ export default boot<Store<unknown>>(({ router, store }) => {
       return next('/')
     }
 
-    if (!isArrayOrString(authMeta)) {
+    if (!Array.isArray(roles)) {
       return next()
     }
 
     const check = store.getters['auth/check'] as RoleChecker
 
-    if (check && check(authMeta)) {
+    if (check(roles)) {
       return next()
     }
 
@@ -33,17 +33,10 @@ export default boot<Store<unknown>>(({ router, store }) => {
   })
 })
 
-function isArrayOrString (variable: any) {
-  if (typeof variable === typeof [] || typeof variable === typeof '') {
-    return true
-  }
-  return false
-}
-
 interface RouteWithAuthMeta extends Route {
   meta?: {
-    auth: AuthMeta
+    authRoles: AuthMeta
   }
 }
 
-type AuthMeta = string | string[] | undefined
+type AuthMeta = string[] | boolean | undefined

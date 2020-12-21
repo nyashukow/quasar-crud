@@ -22,11 +22,11 @@ export default function (config: HttpRequestConfig): HttpInstance {
       const response = await axios.delete<R>(url)
       return response.data
     },
-    setHeader (header: string, value: string) {
+    setHeader (header: string, value: string | undefined) {
       set(axios, ['defaults', 'headers', 'common', header], value)
     },
-    getHeader (header: string): string {
-      return get(axios, ['defaults', 'headers', 'common', header]) as string
+    getHeader (header: string) {
+      return get(axios, ['defaults', 'headers', 'common', header]) as string | undefined
     }
   }
 

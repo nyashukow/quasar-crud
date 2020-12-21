@@ -1,6 +1,6 @@
-import useAxiosProxy from '../../hooks/useAxiosProxy'
+import useAxiosProxy from 'src/hooks/useAxiosProxy'
 import { Cookies } from 'quasar'
-import { AuthState, LoginData, RegisterData, UserFetchData } from 'src/types'
+import { AuthState, LoginData, LoginResponse, RegisterData, User } from 'src/types'
 import { ActionContext } from 'vuex'
 
 const http = useAxiosProxy({ baseUrl: 'http://localhost:3001' })
@@ -10,65 +10,54 @@ export function register (ctx: AuthActionContext, data: RegisterData) {
 }
 
 export function login (ctx: AuthActionContext, data: LoginData) {
-  return http.post<LoginData, { user: UserFetchData, token: string }>('/auth/login', data)
+  return http.post<LoginData, LoginResponse>('/auth/login', data)
     .then(async response => {
-      ctx.commit('setUser', response.user)
+      const { user } = response
+      await ctx.dispatch('setUser', user)
 
-      const token = response.token
-      await ctx.dispatch('setAuthHeader', token)
-      const cookiesData = { token: token, rememberMe: data.rememberMe } as CookiesData
-      await ctx.dispatch('setCookies', cookiesData)
+      const { token } = response
+      await ctx.dispatch('setHttpHeader', token)
+
+      if (data.rememberMe) {
+        await ctx.dispatch('setLongtimeCookies', token)
+      } else {
+        await ctx.dispatch('setCookies', token)
+      }
     })
 }
 
-export function setAuthHeader (ctx: AuthActionContext, token: string) {
+export function setUser (ctx: AuthActionContext, data: User | undefined) {
+  ctx.commit('setUser', data)
+}
+
+export function setHttpHeader (ctx: AuthActionContext, token: string) {
   http.setHeader('Authorization', `Bearer ${token}`)
 }
 
-export function setCookies (state: AuthActionContext, data: CookiesData) {
-  if (data.rememberMe) {
-    Cookies.set('authorization_token', data.token, {
-      expires: 365
-    })
-  } else {
-    Cookies.set('authorization_token', data.token)
-  }
+export function setCookies (ctx: AuthActionContext, token: string) {
+  Cookies.set('authorization_token', token)
+}
+
+export function setLongtimeCookies (ctx: AuthActionContext, token: string) {
+  Cookies.set('authorization_token', token, { expires: 365 })
 }
 
 export async function fetch (ctx: AuthActionContext) {
   const token = Cookies.get('authorization_token')
 
   if (token) {
-    await ctx.dispatch('setAuthHeader', token)
-  }
-
-  if (!http.getHeader('Authorization')) {
+    await ctx.dispatch('setHttpHeader', token)
+  } else {
     throw new Error('No authorization token found')
   }
 
-  return http.get<UserFetchData>('/auth/me').then(response => {
-    ctx.commit('setUser', response)
-  }).then(async () => {
-    await ctx.dispatch('loginCallback')
-  })
+  return http.get<User>('/auth/me').then(response => ctx.dispatch('setUser', response))
 }
 
 export function logout (ctx: AuthActionContext) {
   Cookies.remove('authorization_token')
-  ctx.commit('setUser', null)
-}
-
-export function verify (ctx: AuthActionContext, token: string) {
-  return http.get<boolean>(`/auth/verify?token=${token}`)
-}
-
-export function loginCallback (ctx: AuthActionContext) {
-  ctx.state.loginCallbacks.forEach(cb => cb())
+  http.setHeader('Authorization', undefined)
+  return ctx.dispatch('setUser')
 }
 
 type AuthActionContext = ActionContext<AuthState, AuthState>
-
-interface CookiesData {
-  token: string,
-  rememberMe: boolean
-}
