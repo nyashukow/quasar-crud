@@ -5,6 +5,12 @@ export interface Person extends Identible<number> {
   phone?: string
 }
 
+export interface User extends Identible<number> {
+  email: string,
+  name: string,
+  roles: string[]
+}
+
 export interface Identible<T = string | number> {
   id?: T
 }

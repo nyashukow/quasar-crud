@@ -1,6 +1,6 @@
 import { Store } from 'vuex'
 import { computed, ComputedRef } from '@vue/composition-api'
-import { AuthState, User, LoginData, RegisterData } from 'src/types'
+import { User, LoginData, RegisterData, StoreState } from 'src/types'
 
 export default function (store: Store<StoreState>): Auth {
   return {
@@ -12,10 +12,6 @@ export default function (store: Store<StoreState>): Auth {
     loggedIn: () => store.getters['auth/loggedIn'] as ComputedRef<boolean>,
     user: () => computed(() => store.state.auth.user)
   }
-}
-
-interface StoreState {
-  auth: AuthState
 }
 
 export interface Auth {

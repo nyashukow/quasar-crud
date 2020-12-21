@@ -1,7 +1,7 @@
-import useAxiosProxy from 'src/hooks/useAxiosProxy'
 import { Cookies } from 'quasar'
-import { AuthState, LoginData, LoginResponse, RegisterData, User } from 'src/types'
 import { ActionContext } from 'vuex'
+import useAxiosProxy from 'src/hooks/useAxiosProxy'
+import { AuthState, LoginData, LoginResponse, RegisterData, StoreState, User } from 'src/types'
 
 const http = useAxiosProxy({ baseUrl: 'http://localhost:3001' })
 
@@ -12,10 +12,9 @@ export function register (ctx: AuthActionContext, data: RegisterData) {
 export function login (ctx: AuthActionContext, data: LoginData) {
   return http.post<LoginData, LoginResponse>('/auth/login', data)
     .then(async response => {
-      const { user } = response
-      await ctx.dispatch('setUser', user)
+      const { user, token } = response
 
-      const { token } = response
+      await ctx.dispatch('setUser', user)
       await ctx.dispatch('setHttpHeader', token)
 
       if (data.rememberMe) {
@@ -60,4 +59,4 @@ export function logout (ctx: AuthActionContext) {
   return ctx.dispatch('setUser')
 }
 
-type AuthActionContext = ActionContext<AuthState, AuthState>
+type AuthActionContext = ActionContext<AuthState, StoreState>
