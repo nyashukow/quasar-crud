@@ -1,10 +1,10 @@
 <template>
-<q-card-section class="q-pt-none" v-if="person">
-  <q-input v-model="person.name" label="Name" />
-  <q-input v-model="person.username" label="Username" />
-  <q-input v-model="person.email" label="Email" />
-  <q-input v-model="person.phone" label="Phone" />
-</q-card-section>
+  <q-card-section class="q-pt-none" v-if="person">
+    <q-input v-model="person.name" label="Name" />
+    <q-input v-model="person.username" label="Username" />
+    <q-input v-model="person.email" label="Email" />
+    <q-input v-model="person.phone" label="Phone" />
+  </q-card-section>
 </template>
 
 <script lang="ts">
