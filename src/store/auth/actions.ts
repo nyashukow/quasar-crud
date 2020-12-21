@@ -3,7 +3,7 @@ import { ActionContext } from 'vuex'
 import useAxiosProxy from 'src/hooks/useAxiosProxy'
 import { AuthState, LoginData, LoginResponse, RegisterData, StoreState, User } from 'src/types'
 
-const http = useAxiosProxy({ baseUrl: 'http://localhost:3001' })
+const http = useAxiosProxy({ baseUrl: 'http://localhost:8000' })
 
 export function register (ctx: AuthActionContext, data: RegisterData) {
   return http.post<RegisterData, void>('/auth/register', data)

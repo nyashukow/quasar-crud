@@ -13,7 +13,7 @@
         @click:remove="remove"
       >
         <template v-slot:form>
-          <person-form v-slot:form :person="person" />
+          <person-form :person="person" />
         </template>
       </base-card>
     </q-dialog>
