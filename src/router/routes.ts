@@ -4,9 +4,15 @@ const routes: RouteConfig[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/Index.vue'), meta: { auth: { roles: true } } }
-    ]
+    children: [{
+      path: '',
+      component: () => import('pages/Index.vue'),
+      meta: { auth: { roles: true } }
+    }, {
+      path: 'cards/:id?',
+      component: () => import('pages/Cards.vue'),
+      meta: { auth: { roles: true } }
+    }]
   },
   {
     path: '/',

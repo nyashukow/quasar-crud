@@ -1,17 +1,13 @@
 <template>
-  <div />
+  <div class="row full-height">
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
 
 export default defineComponent({
-  name: 'IndexPage',
-
-  setup () {
-    return {
-    }
-  }
+  name: 'IndexPage'
 })
 </script>
 

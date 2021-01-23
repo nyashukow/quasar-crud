@@ -2,6 +2,8 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
+        <q-btn flat label="Главная" to="/" />
+        <q-btn flat label="Карточки" to="/cards" />
         <q-space />
         <q-btn v-if="user" flat color="white" :label="user.username">
           <q-avatar>
@@ -18,7 +20,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
+    <q-page-container class="window-height">
       <router-view />
     </q-page-container>
   </q-layout>
