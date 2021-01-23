@@ -12,8 +12,10 @@ export interface LoginData {
 }
 
 export interface LoginResponse {
-  user: User,
-  token: string
+  data: {
+    user: User,
+    accessToken: string
+  }
 }
 
 export type RoleChecker = (roles: string | string[]) => boolean

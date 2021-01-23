@@ -2,29 +2,21 @@
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
-        />
         <q-space />
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn v-if="user" flat color="white" :label="user.username">
+          <q-avatar>
+            <q-icon name="person" />
+          </q-avatar>
+          <q-menu>
+            <q-list>
+              <q-item clickable @click="logout">
+                <q-item-section>Выйти</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
-
-      <div class="q-px-lg q-pt-xl q-mb-md">
-        <div class="text-h3">Quasar example</div>
-        <div class="text-subtitle1">
-          {{ today }}
-        </div>
-      </div>
-
-      <q-img src="images/mountains.png" class="header-image absolute-top" />
     </q-header>
-
-    <main-drawer v-model="leftDrawerOpen" />
 
     <q-page-container>
       <router-view />
@@ -33,31 +25,23 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from '@vue/composition-api'
-import { date } from 'quasar'
-import MainDrawer from 'components/MainDrawer.vue'
+import { defineComponent } from '@vue/composition-api'
+import useAuth from 'src/hooks/useAuth'
 
 export default defineComponent({
   name: 'MainLayout',
 
-  components: { MainDrawer },
+  setup (props, context) {
+    const auth = useAuth(context.root.$store)
 
-  setup () {
-    const leftDrawerOpen = ref(false)
+    return {
+      user: auth.user(),
 
-    const today = computed(() => {
-      return date.formatDate(Date.now(), 'dddd D MMMM')
-    })
-
-    return { leftDrawerOpen, today }
+      logout: () => auth.logout().then(() => context.root.$router.push('/login'))
+    }
   }
 })
 </script>
 
 <style lang="scss">
-.header-image {
-  height: 100%;
-  z-index: -1;
-  opacity: 0.4;
-}
 </style>

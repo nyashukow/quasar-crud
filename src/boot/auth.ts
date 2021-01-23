@@ -10,6 +10,13 @@ export default boot<Store<unknown>>(({ router, store }) => {
       await store.dispatch('auth/fetch').catch(() => store.dispatch('auth/logout'))
     }
 
+    if (
+      store.getters['auth/loggedIn'] &&
+      ['/login', '/registration'].includes(to.path)
+    ) {
+      next('/')
+    }
+
     const roles = _.get(to, ['meta', 'auth', 'roles'], undefined) as AuthRoles
 
     if (!roles) {
@@ -17,7 +24,7 @@ export default boot<Store<unknown>>(({ router, store }) => {
     }
 
     if (!store.getters['auth/loggedIn']) {
-      return next('/')
+      return next('/login')
     }
 
     if (!Array.isArray(roles)) {
@@ -30,7 +37,7 @@ export default boot<Store<unknown>>(({ router, store }) => {
       return next()
     }
 
-    next('/')
+    next('/login')
   })
 })
 

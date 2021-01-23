@@ -5,5 +5,6 @@ export interface StoreState {
 }
 
 export interface AuthState {
-  user: User | undefined
+  user: User | undefined,
+  token: string
 }

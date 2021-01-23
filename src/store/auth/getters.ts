@@ -12,13 +12,9 @@ export function check (state: AuthState) {
       return false
     }
 
-    const userRoles = user.roles
+    const userRole = user.role
 
-    if (!checkedRoles.length) {
-      return false
-    }
-
-    if (checkedRoles.some(role => !userRoles.includes(role))) {
+    if (!checkedRoles.includes(userRole)) {
       return false
     }
 
